@@ -8,6 +8,9 @@ keywords.workspace = true
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[[bin]]
+name = "cairo1-run"
+
 [dependencies]
 cairo-vm = {workspace = true, features = ["std", "cairo-1-hints", "clap"]}
 serde_json = { workspace = true }
