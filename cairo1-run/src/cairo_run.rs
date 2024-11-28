@@ -117,7 +117,7 @@ impl Cairo1RunConfig<'_> {
     // Returns true if the flags in the config enable adding the output builtin and
     // copying input and output values into it's segment
     fn copy_to_output(&self) -> bool {
-        self.append_return_values || self.proof_mode
+        self.append_return_values
     }
 }
 
