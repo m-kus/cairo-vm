@@ -25,7 +25,7 @@ jobs:
         enable-cache: true
     - name: Install python deps
       run: |
-          make ci-python-deps
+          make deps-python
           . cairo-vm-env/bin/activate
           echo PATH=$PATH >> $GITHUB_ENV
     - name: Run benchmark

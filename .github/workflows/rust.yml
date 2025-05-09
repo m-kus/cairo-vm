@@ -84,7 +84,7 @@ jobs:
       if: steps.cache-programs.outputs.cache-hit != 'true'
         && matrix.program-target != 'cairo_1_test_contracts'
         && matrix.program-target != 'cairo_2_test_contracts'
-      run: make ci-python-deps && . cairo-vm-env/bin/activate && echo PATH=$PATH >> $GITHUB_ENV
+      run: make deps-python && . cairo-vm-env/bin/activate && echo PATH=$PATH >> $GITHUB_ENV
 
     - name: Install cairo 1 compiler
       if: steps.cache-programs.outputs.cache-hit != 'true' && matrix.program-target == 'cairo_1_test_contracts'
@@ -447,7 +447,7 @@ jobs:
         enable-cache: true
     - name: Install python deps
       if: steps.trace-cache.outputs.cache-hit != 'true'
-      run: make ci-python-deps && . cairo-vm-env/bin/activate && echo PATH=$PATH >> $GITHUB_ENV
+      run: make deps-python && . cairo-vm-env/bin/activate && echo PATH=$PATH >> $GITHUB_ENV
 
     - name: Fetch programs
       if: steps.trace-cache.outputs.cache-hit != 'true'
@@ -733,7 +733,7 @@ jobs:
       with:
         enable-cache: true
     - name: Install python deps
-      run: make ci-python-deps && . cairo-vm-env/bin/activate && echo PATH=$PATH >> $GITHUB_ENV
+      run: make deps-python && . cairo-vm-env/bin/activate && echo PATH=$PATH >> $GITHUB_ENV
 
     - name: Install cairo-lang and deps
       run: |
@@ -758,7 +758,7 @@ jobs:
       with:
         enable-cache: true
     - name: Install python deps
-      run: make ci-python-deps && . cairo-vm-env/bin/activate && echo PATH=$PATH >> $GITHUB_ENV
+      run: make deps-python && . cairo-vm-env/bin/activate && echo PATH=$PATH >> $GITHUB_ENV
 
     - name: Fetch release binary
       uses: actions/cache/restore@v3
@@ -795,7 +795,7 @@ jobs:
       with:
         enable-cache: true
     - name: Install python deps
-      run: make ci-python-deps && . cairo-vm-env/bin/activate && echo PATH=$PATH >> $GITHUB_ENV
+      run: make deps-python && . cairo-vm-env/bin/activate && echo PATH=$PATH >> $GITHUB_ENV
 
     - name: Fetch release binary
       uses: actions/cache/restore@v3
@@ -844,7 +844,7 @@ jobs:
       with:
         enable-cache: true
     - name: Install python deps
-      run: make ci-python-deps && . cairo-vm-env/bin/activate && echo PATH=$PATH >> $GITHUB_ENV
+      run: make deps-python && . cairo-vm-env/bin/activate && echo PATH=$PATH >> $GITHUB_ENV
 
     - name: Fetch release binary
       uses: actions/cache/restore@v3

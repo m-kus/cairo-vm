@@ -227,13 +227,21 @@ cargo-deps:
 cairo1-run-deps:
 	cd cairo1-run; make deps
 
-deps: create-proof-programs-symlinks cargo-deps build-cairo-1-compiler build-cairo-2-compiler cairo1-run-deps
+deps: create-proof-programs-symlinks cargo-deps build-cairo-1-compiler build-cairo-2-compiler cairo1-run-deps deps-python ;
+
+deps-macos: create-proof-programs-symlinks cargo-deps build-cairo-1-compiler-macos build-cairo-2-compiler-macos cairo1-run-deps deps-macos-python ;
+
+deps-python:
+	uv python install pypy3.9.15 ; \
+	uv venv --python pypy3.9.15 cairo-vm-pypy-env ; \
+	. cairo-vm-pypy-env/bin/activate ; \
+	uv pip install -r requirements.txt ; \
 	uv python install 3.9.15 ; \
 	uv venv --python 3.9.15 cairo-vm-env
 	. cairo-vm-env/bin/activate ; \
 	uv pip install -r requirements.txt ; \
 
-deps-macos: create-proof-programs-symlinks cargo-deps build-cairo-1-compiler-macos build-cairo-2-compiler-macos cairo1-run-deps
+deps-macos-python:
 	uv python install pypy3.9.15 ; \
 	uv venv --python pypy3.9.15 cairo-vm-pypy-env ; \
 	. cairo-vm-pypy-env/bin/activate ; \
@@ -242,13 +250,6 @@ deps-macos: create-proof-programs-symlinks cargo-deps build-cairo-1-compiler-mac
 	uv venv --python 3.9.15 cairo-vm-env ; \
 	. cairo-vm-env/bin/activate ; \
 	CFLAGS=-I/opt/homebrew/opt/gmp/include LDFLAGS=-L/opt/homebrew/opt/gmp/lib uv pip install -r requirements.txt ; \
-
-# Used in CI when only python deps are needed.
-ci-python-deps:
-	uv python install 3.9.15 ; \
-	uv venv --python 3.9.15 cairo-vm-env
-	. cairo-vm-env/bin/activate ; \
-	uv pip install -r requirements.txt ; \
 
 $(RELBIN):
 	cargo build --release
