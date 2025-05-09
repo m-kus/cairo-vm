@@ -21,12 +21,6 @@ jobs:
       uses: astral-sh/setup-uv@v5
       with:
         enable-cache: true
-    - name: Install python deps
-      run: |
-          uv python install 3.9.15
-          uv venv --python 3.9.15 cairo-vm-env
-          . cairo-vm-env/bin/activate
-          uv pip install -r requirements.txt
 
     - name: Install Dependencies
       run: |
@@ -78,6 +72,13 @@ jobs:
       with:
         name: hyper_threading_workflow_script
         path: ${{ github.workspace }}/
+
+    - name: Install python deps
+      run: |
+          uv python install 3.9.15
+          uv venv --python 3.9.15 cairo-vm-env
+          . cairo-vm-env/bin/activate
+          uv pip install -r requirements.txt
 
     - name: Compile programs
       run: . cairo-vm-env/bin/activate && make cairo_bench_programs
