@@ -234,6 +234,10 @@ deps: create-proof-programs-symlinks cargo-deps build-cairo-1-compiler build-cai
 	uv pip install -r requirements.txt ; \
 
 deps-macos: create-proof-programs-symlinks cargo-deps build-cairo-1-compiler-macos build-cairo-2-compiler-macos cairo1-run-deps
+	uv python install pypy3.9.15 ; \
+	uv venv --python pypy3.9.15 cairo-vm-pypy-env ; \
+	. cairo-vm-pypy-env/bin/activate ; \
+	CFLAGS=-I/opt/homebrew/opt/gmp/include LDFLAGS=-L/opt/homebrew/opt/gmp/lib uv pip install -r requirements.txt ; \
 	uv python install 3.9.15 ; \
 	uv venv --python 3.9.15 cairo-vm-env ; \
 	. cairo-vm-env/bin/activate ; \
