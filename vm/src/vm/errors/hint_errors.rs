@@ -3,7 +3,7 @@
 
 use crate::stdlib::prelude::*;
 
-use thiserror_no_std::Error;
+use thiserror::Error;
 
 use crate::Felt252;
 use num_bigint::{BigInt, BigUint};
@@ -196,6 +196,8 @@ pub enum HintError {
     EmptyNibbles,
     #[error("circuit evalution: {0}")]
     CircuitEvaluationFailed(Box<str>),
+    #[error("high limb magnitude should be smaller than 2 ** 127: {0}")]
+    BlsSplitError(Box<BigInt>),
 }
 
 #[cfg(test)]

@@ -1,4 +1,5 @@
 use crate::{tests::*, types::layout_name::LayoutName};
+
 #[cfg(feature = "mod_builtin")]
 use crate::{
     utils::test_utils::Program,
@@ -1155,6 +1156,14 @@ fn cairo_run_mod_builtin_failure() {
 
 #[test]
 #[cfg(feature = "mod_builtin")]
+fn cairo_run_mod_builtin_no_solution() {
+    let program_data =
+        include_bytes!("../../../cairo_programs/mod_builtin_feature/mod_builtin_no_solution.json");
+    run_program_with_error(program_data, "Could not fill the values table");
+}
+
+#[test]
+#[cfg(feature = "mod_builtin")]
 fn cairo_run_mod_builtin_large_batch_size() {
     let program_data = include_bytes!(
         "../../../cairo_programs/mod_builtin_feature/mod_builtin_large_batch_size.json"
@@ -1332,6 +1341,15 @@ fn cairo_run_secp_cairo0_ec_mul_by_uint256() {
     let program_data = include_bytes!(
         "../../../cairo_programs/cairo-0-secp-hints-feature/secp_cairo0_ec_mul_by_uint256.json"
     );
+    run_program_simple(program_data.as_slice());
+}
+
+#[test]
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
+#[cfg(feature = "cairo-0-secp-hints")]
+fn cairo_run_secp_cairo0_negative_points() {
+    let program_data =
+        include_bytes!("../../../cairo_programs/cairo-0-secp-hints-feature/negative_points.json");
     run_program_simple(program_data.as_slice());
 }
 

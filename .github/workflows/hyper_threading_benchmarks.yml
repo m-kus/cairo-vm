@@ -1,9 +1,14 @@
 name: Benchmark Hyper Threading
 
+permissions:
+  # permission to write a bench comment
+  issues: write
+  # permission to write a bench comment
+  pull-requests: write
+
 on:
   pull_request:
-    branches:
-      - main
+    branches: [ main, starkware-development ]
 
 jobs:
   benchmark:
@@ -11,8 +16,6 @@ jobs:
     steps:
     - name: Checkout PR
       uses: actions/checkout@v4
-      with:
-        ref: ${{ github.head_ref }}
 
     - name: Install uv
       uses: astral-sh/setup-uv@v5
@@ -31,7 +34,7 @@ jobs:
         sudo apt-get install -y hyperfine
 
     - name: Install Rust
-      uses: dtolnay/rust-toolchain@1.85.0
+      uses: dtolnay/rust-toolchain@1.86.0
       with:
         components: rustfmt, clippy
 
