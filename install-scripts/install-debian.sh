@@ -4,9 +4,10 @@ set -ex
 apt update -y
 
 # Install curl in order to install Rust, Cargo and UV.
-# Install make.
-apt install -y curl \
-               make
+apt install -y curl
+
+# Install general dependencies
+apt install -y git
 
 # Install Rust and Cargo
 curl https://sh.rustup.rs -sSf | sh -s -- -y
