@@ -19,7 +19,7 @@ endif
 	compare_trace_memory_proof  compare_all_proof compare_trace_proof compare_memory_proof compare_air_public_input  compare_air_private_input\
 	hyper-threading-benchmarks \
 	cairo_bench_programs cairo_proof_programs cairo_test_programs cairo_1_test_contracts cairo_2_test_contracts \
-	cairo_trace cairo-vm_trace cairo_proof_trace cairo-vm_proof_trace ci-python-deps \
+	cairo_trace cairo-vm_trace cairo_proof_trace cairo-vm_proof_trace python-deps \
 	fuzzer-deps fuzzer-run-cairo-compiled fuzzer-run-hint-diff build-cairo-lang hint-accountant \ create-proof-programs-symlinks \
 	$(RELBIN) $(DBGBIN)
 
@@ -229,13 +229,13 @@ cairo1-run-deps:
 
 deps: create-proof-programs-symlinks cargo-deps build-cairo-1-compiler build-cairo-2-compiler cairo1-run-deps python-deps ;
 
-deps-macos: create-proof-programs-symlinks cargo-deps build-cairo-1-compiler-macos build-cairo-2-compiler-macos cairo1-run-deps python-deps-macos ;
-
 python-deps:
 	uv python install 3.9.15 ; \
 	uv venv --python 3.9.15 cairo-vm-env
 	. cairo-vm-env/bin/activate ; \
 	uv pip install -r requirements.txt ; \
+
+deps-macos: create-proof-programs-symlinks cargo-deps build-cairo-1-compiler-macos build-cairo-2-compiler-macos cairo1-run-deps python-deps-macos ;
 
 python-deps-macos:
 	uv python install 3.9.15 ; \
