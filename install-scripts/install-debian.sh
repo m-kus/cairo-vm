@@ -7,7 +7,7 @@ apt update -y
 apt install -y curl
 
 # Install general dependencies
-apt install -y git
+apt install -y git make
 
 # Install Rust and Cargo
 curl https://sh.rustup.rs -sSf | sh -s -- -y
