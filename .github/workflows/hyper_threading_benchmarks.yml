@@ -79,13 +79,13 @@ jobs:
           uv venv --python 3.9.15 cairo-vm-env
           . cairo-vm-env/bin/activate
           uv pip install -r requirements.txt
+          echo PATH=$PATH >> $GITHUB_ENV
 
     - name: Compile programs
-      run: . cairo-vm-env/bin/activate && make cairo_bench_programs
+      run: make cairo_bench_programs
 
     - name: Run Benchmarks
       run: |
-        . cairo-vm-env/bin/activate
         cd ${{ github.workspace }}
         chmod +x ./hyper_threading_main
         chmod +x ./hyper_threading_pr
