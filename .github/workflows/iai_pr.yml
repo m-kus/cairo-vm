@@ -64,7 +64,7 @@ jobs:
       with:
           enable-cache: true
     - name: Install python deps
-      run: make deps-python && . cairo-vm-env/bin/activate && echo PATH=$PATH >> $GITHUB_ENV
+      run: make python-deps && . cairo-vm-env/bin/activate && echo PATH=$PATH >> $GITHUB_ENV
     - name: Install test dependencies
       run: |
         sudo apt update
