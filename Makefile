@@ -19,7 +19,7 @@ endif
 	compare_trace_memory_proof  compare_all_proof compare_trace_proof compare_memory_proof compare_air_public_input  compare_air_private_input\
 	hyper-threading-benchmarks \
 	cairo_bench_programs cairo_proof_programs cairo_test_programs cairo_1_test_contracts cairo_2_test_contracts \
-	cairo_trace cairo-vm_trace cairo_proof_trace cairo-vm_proof_trace python-deps \
+	cairo_trace cairo-vm_trace cairo_proof_trace cairo-vm_proof_trace python-deps python-deps-macos \
 	fuzzer-deps fuzzer-run-cairo-compiled fuzzer-run-hint-diff build-cairo-lang hint-accountant \ create-proof-programs-symlinks \
 	$(RELBIN) $(DBGBIN)
 
