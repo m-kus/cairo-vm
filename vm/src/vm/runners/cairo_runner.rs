@@ -688,6 +688,8 @@ impl CairoRunner {
             .hints_collection
             .hints_ranges
             .clone();
+        #[cfg(feature = "extensive_hints")]
+        let mut inner_program_constants = HashMap::new();
         #[cfg(feature = "test_utils")]
         self.vm.execute_before_first_step(&hint_data)?;
         while self.vm.get_pc() != address && !hint_processor.consumed() {
@@ -708,6 +710,8 @@ impl CairoRunner {
                 #[cfg(feature = "extensive_hints")]
                 &mut hint_ranges,
                 &self.program.constants,
+                #[cfg(feature = "extensive_hints")]
+                &mut inner_program_constants,
             )?;
 
             hint_processor.consume_step();
@@ -749,6 +753,9 @@ impl CairoRunner {
             })
             .unwrap_or(&[]);
 
+        #[cfg(feature = "extensive_hints")]
+        let mut inner_program_constants = HashMap::new();
+
         for remaining_steps in (1..=steps).rev() {
             if self.final_pc.as_ref() == Some(&self.vm.get_pc()) {
                 return Err(VirtualMachineError::EndOfProgram(remaining_steps));
@@ -764,6 +771,8 @@ impl CairoRunner {
                 #[cfg(feature = "extensive_hints")]
                 &mut hint_ranges,
                 &self.program.constants,
+                #[cfg(feature = "extensive_hints")]
+                &mut inner_program_constants,
             )?;
         }
 
