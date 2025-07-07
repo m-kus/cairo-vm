@@ -41,6 +41,7 @@ use crate::{
             runners::builtin_runner::{
                 BitwiseBuiltinRunner, BuiltinRunner, EcOpBuiltinRunner, HashBuiltinRunner,
                 OutputBuiltinRunner, RangeCheckBuiltinRunner, SignatureBuiltinRunner,
+                SystemBuiltinRunner,
             },
             vm_core::VirtualMachine,
         },
@@ -281,6 +282,7 @@ impl CairoRunner {
     pub fn initialize_builtins(&mut self, allow_missing_builtins: bool) -> Result<(), RunnerError> {
         let builtin_ordered_list = vec![
             BuiltinName::output,
+            BuiltinName::system,
             BuiltinName::pedersen,
             BuiltinName::range_check,
             BuiltinName::ecdsa,
@@ -303,6 +305,15 @@ impl CairoRunner {
                 self.vm
                     .builtin_runners
                     .push(OutputBuiltinRunner::new(included).into());
+            }
+        }
+
+        if self.layout.builtins.system {
+            let included = program_builtins.remove(&BuiltinName::system);
+            if included || self.is_proof_mode() {
+                self.vm
+                    .builtin_runners
+                    .push(SystemBuiltinRunner::new(included).into());
             }
         }
 
@@ -459,6 +470,9 @@ impl CairoRunner {
                     ModBuiltinRunner::new_mul_mod(&ModInstanceDef::new(Some(1), 1, 96), true)
                         .into(),
                 ),
+                BuiltinName::system => vm
+                    .builtin_runners
+                    .push(SystemBuiltinRunner::new(true).into()),
             }
         }
 

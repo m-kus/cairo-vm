@@ -769,7 +769,9 @@ impl VirtualMachine {
             // Output and SegmentArena do not need to be auto-deduced in the memory.
             if matches!(
                 builtin,
-                BuiltinRunner::Output(_) | BuiltinRunner::SegmentArena(_)
+                BuiltinRunner::Output(_)
+                    | BuiltinRunner::SegmentArena(_)
+                    | BuiltinRunner::System(_)
             ) {
                 continue;
             }
