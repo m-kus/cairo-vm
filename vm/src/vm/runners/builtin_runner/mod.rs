@@ -21,6 +21,7 @@ use crate::types::instance_definitions::poseidon_instance_def::{
     CELLS_PER_POSEIDON, INPUT_CELLS_PER_POSEIDON,
 };
 use crate::types::instance_definitions::range_check_instance_def::CELLS_PER_RANGE_CHECK;
+use crate::types::instance_definitions::system_instance_def::CELLS_PER_SYSTEM;
 use crate::types::relocatable::{MaybeRelocatable, Relocatable};
 use crate::vm::errors::memory_errors::{self, InsufficientAllocatedCellsError, MemoryError};
 use crate::vm::errors::runner_errors::RunnerError;
@@ -39,6 +40,7 @@ mod poseidon;
 mod range_check;
 mod segment_arena;
 mod signature;
+mod system;
 
 pub use self::keccak::KeccakBuiltinRunner;
 pub(crate) use self::range_check::{RC_N_PARTS_96, RC_N_PARTS_STANDARD};
@@ -53,6 +55,7 @@ pub use poseidon::PoseidonBuiltinRunner;
 pub use range_check::RangeCheckBuiltinRunner;
 pub use segment_arena::SegmentArenaBuiltinRunner;
 pub use signature::SignatureBuiltinRunner;
+pub use system::SystemBuiltinRunner;
 
 use super::cairo_pie::BuiltinAdditionalData;
 
@@ -82,6 +85,7 @@ pub enum BuiltinRunner {
     Poseidon(PoseidonBuiltinRunner),
     SegmentArena(SegmentArenaBuiltinRunner),
     Mod(ModBuiltinRunner),
+    System(SystemBuiltinRunner),
 }
 
 impl BuiltinRunner {
@@ -105,6 +109,7 @@ impl BuiltinRunner {
                 segment_arena.initialize_segments(segments)
             }
             BuiltinRunner::Mod(ref mut modulo) => modulo.initialize_segments(segments),
+            BuiltinRunner::System(ref mut system) => system.initialize_segments(segments),
         }
     }
 
@@ -121,6 +126,7 @@ impl BuiltinRunner {
             BuiltinRunner::Poseidon(ref poseidon) => poseidon.initial_stack(),
             BuiltinRunner::SegmentArena(ref segment_arena) => segment_arena.initial_stack(),
             BuiltinRunner::Mod(ref modulo) => modulo.initial_stack(),
+            BuiltinRunner::System(ref system) => system.initial_stack(),
         }
     }
 
@@ -140,6 +146,7 @@ impl BuiltinRunner {
                 .memory
                 .get_relocatable(stop_pointer_addr)
                 .map_err(|_| RunnerError::NoStopPointer(Box::new(self.name())))?;
+
             if self.base() as isize != stop_pointer.segment_index {
                 return Err(RunnerError::InvalidStopPointerIndex(Box::new((
                     self.name(),
@@ -185,7 +192,9 @@ impl BuiltinRunner {
         vm: &VirtualMachine,
     ) -> Result<usize, memory_errors::MemoryError> {
         match *self {
-            BuiltinRunner::Output(_) | BuiltinRunner::SegmentArena(_) => Ok(0),
+            BuiltinRunner::Output(_)
+            | BuiltinRunner::SegmentArena(_)
+            | BuiltinRunner::System(_) => Ok(0),
             _ => {
                 match self.ratio() {
                     None => {
@@ -246,6 +255,7 @@ impl BuiltinRunner {
             BuiltinRunner::Poseidon(ref poseidon) => poseidon.included,
             BuiltinRunner::SegmentArena(ref segment_arena) => segment_arena.included,
             BuiltinRunner::Mod(ref modulo) => modulo.included,
+            BuiltinRunner::System(ref system) => system.included,
         }
     }
 
@@ -264,6 +274,7 @@ impl BuiltinRunner {
             //Warning, returns only the segment index, base offset will be 3
             BuiltinRunner::SegmentArena(ref segment_arena) => segment_arena.base(),
             BuiltinRunner::Mod(ref modulo) => modulo.base(),
+            BuiltinRunner::System(ref system) => system.base(),
         }
     }
 
@@ -279,6 +290,7 @@ impl BuiltinRunner {
             BuiltinRunner::Signature(ref signature) => signature.ratio(),
             BuiltinRunner::Poseidon(poseidon) => poseidon.ratio(),
             BuiltinRunner::Mod(ref modulo) => modulo.ratio(),
+            BuiltinRunner::System(ref system) => system.ratio(),
         }
     }
 
@@ -335,6 +347,7 @@ impl BuiltinRunner {
                 segment_arena.get_used_cells(segments)
             }
             BuiltinRunner::Mod(ref modulo) => modulo.get_used_cells(segments),
+            BuiltinRunner::System(ref system) => system.get_used_cells(segments),
         }
     }
 
@@ -358,6 +371,7 @@ impl BuiltinRunner {
                 segment_arena.get_used_instances(segments)
             }
             BuiltinRunner::Mod(modulo) => modulo.get_used_instances(segments),
+            BuiltinRunner::System(ref system) => system.get_used_instances(segments),
         }
     }
 
@@ -413,6 +427,7 @@ impl BuiltinRunner {
             BuiltinRunner::Poseidon(_) => CELLS_PER_POSEIDON,
             BuiltinRunner::SegmentArena(_) => ARENA_BUILTIN_SIZE,
             BuiltinRunner::Mod(_) => CELLS_PER_MOD,
+            BuiltinRunner::System(_) => CELLS_PER_SYSTEM,
         }
     }
 
@@ -428,6 +443,7 @@ impl BuiltinRunner {
             BuiltinRunner::Poseidon(_) => INPUT_CELLS_PER_POSEIDON,
             BuiltinRunner::SegmentArena(_) => ARENA_BUILTIN_SIZE,
             BuiltinRunner::Mod(_) => CELLS_PER_MOD,
+            BuiltinRunner::System(_) => CELLS_PER_SYSTEM,
         }
     }
 
@@ -451,11 +467,15 @@ impl BuiltinRunner {
             BuiltinRunner::Poseidon(_) => BuiltinName::poseidon,
             BuiltinRunner::SegmentArena(_) => BuiltinName::segment_arena,
             BuiltinRunner::Mod(b) => b.name(),
+            BuiltinRunner::System(_) => BuiltinName::system,
         }
     }
 
     pub fn run_security_checks(&self, vm: &VirtualMachine) -> Result<(), VirtualMachineError> {
-        if let BuiltinRunner::Output(_) | BuiltinRunner::SegmentArena(_) = self {
+        if let BuiltinRunner::Output(_)
+        | BuiltinRunner::SegmentArena(_)
+        | BuiltinRunner::System(_) = self
+        {
             return Ok(());
         }
         if let BuiltinRunner::Mod(modulo) = self {
@@ -626,6 +646,7 @@ impl BuiltinRunner {
                 segment_arena.stop_ptr = Some(stop_ptr)
             }
             BuiltinRunner::Mod(modulo) => modulo.stop_ptr = Some(stop_ptr),
+            BuiltinRunner::System(ref mut system) => system.stop_ptr = Some(stop_ptr),
         }
     }
 
@@ -642,6 +663,7 @@ impl BuiltinRunner {
             BuiltinRunner::Poseidon(ref poseidon) => poseidon.stop_ptr,
             BuiltinRunner::SegmentArena(ref segment_arena) => segment_arena.stop_ptr,
             BuiltinRunner::Mod(ref modulo) => modulo.stop_ptr,
+            BuiltinRunner::System(ref system) => system.stop_ptr,
         }
     }
 }
@@ -709,6 +731,12 @@ impl From<SegmentArenaBuiltinRunner> for BuiltinRunner {
 impl From<ModBuiltinRunner> for BuiltinRunner {
     fn from(runner: ModBuiltinRunner) -> Self {
         BuiltinRunner::Mod(runner)
+    }
+}
+
+impl From<SystemBuiltinRunner> for BuiltinRunner {
+    fn from(runner: SystemBuiltinRunner) -> Self {
+        BuiltinRunner::System(runner)
     }
 }
 
