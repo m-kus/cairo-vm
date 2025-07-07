@@ -1174,6 +1174,7 @@ fn finalize_builtins(
                 "AddMod" => BuiltinName::add_mod,
                 "MulMod" => BuiltinName::mul_mod,
                 "RangeCheck96" => BuiltinName::range_check96,
+                "System" => BuiltinName::system,
                 _ => {
                     stack_pointer.offset += size as usize;
                     continue;
