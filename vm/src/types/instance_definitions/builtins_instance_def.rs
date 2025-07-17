@@ -16,6 +16,7 @@ use serde::Serialize;
 #[derive(Serialize, Debug, PartialEq)]
 pub(crate) struct BuiltinsInstanceDef {
     pub(crate) output: bool,
+    pub(crate) system: bool,
     pub(crate) pedersen: Option<PedersenInstanceDef>,
     pub(crate) range_check: Option<RangeCheckInstanceDef>,
     pub(crate) ecdsa: Option<EcdsaInstanceDef>,
@@ -32,6 +33,7 @@ impl BuiltinsInstanceDef {
     pub(crate) fn plain() -> BuiltinsInstanceDef {
         BuiltinsInstanceDef {
             output: false,
+            system: false,
             pedersen: None,
             range_check: None,
             ecdsa: None,
@@ -48,6 +50,7 @@ impl BuiltinsInstanceDef {
     pub(crate) fn small() -> BuiltinsInstanceDef {
         BuiltinsInstanceDef {
             output: true,
+            system: false,
             pedersen: Some(PedersenInstanceDef::default()),
             range_check: Some(RangeCheckInstanceDef::default()),
             ecdsa: Some(EcdsaInstanceDef::default()),
@@ -64,6 +67,7 @@ impl BuiltinsInstanceDef {
     pub(crate) fn dex() -> BuiltinsInstanceDef {
         BuiltinsInstanceDef {
             output: true,
+            system: false,
             pedersen: Some(PedersenInstanceDef::default()),
             range_check: Some(RangeCheckInstanceDef::default()),
             ecdsa: Some(EcdsaInstanceDef::default()),
@@ -80,6 +84,7 @@ impl BuiltinsInstanceDef {
     pub(crate) fn recursive() -> BuiltinsInstanceDef {
         BuiltinsInstanceDef {
             output: true,
+            system: false,
             pedersen: Some(PedersenInstanceDef::new(Some(128))),
             range_check: Some(RangeCheckInstanceDef::default()),
             ecdsa: None,
@@ -96,6 +101,7 @@ impl BuiltinsInstanceDef {
     pub(crate) fn starknet() -> BuiltinsInstanceDef {
         BuiltinsInstanceDef {
             output: true,
+            system: false,
             pedersen: Some(PedersenInstanceDef::new(Some(32))),
             range_check: Some(RangeCheckInstanceDef::new(Some(16))),
             ecdsa: Some(EcdsaInstanceDef::new(Some(2048))),
@@ -112,6 +118,7 @@ impl BuiltinsInstanceDef {
     pub(crate) fn starknet_with_keccak() -> BuiltinsInstanceDef {
         BuiltinsInstanceDef {
             output: true,
+            system: false,
             pedersen: Some(PedersenInstanceDef::new(Some(32))),
             range_check: Some(RangeCheckInstanceDef::new(Some(16))),
             ecdsa: Some(EcdsaInstanceDef::new(Some(2048))),
@@ -128,6 +135,7 @@ impl BuiltinsInstanceDef {
     pub(crate) fn recursive_large_output() -> BuiltinsInstanceDef {
         BuiltinsInstanceDef {
             output: true,
+            system: false,
             pedersen: Some(PedersenInstanceDef::new(Some(128))),
             range_check: Some(RangeCheckInstanceDef::default()),
             ecdsa: None,
@@ -144,6 +152,7 @@ impl BuiltinsInstanceDef {
     pub(crate) fn recursive_with_poseidon() -> BuiltinsInstanceDef {
         BuiltinsInstanceDef {
             output: true,
+            system: false,
             pedersen: Some(PedersenInstanceDef::new(Some(256))),
             range_check: Some(RangeCheckInstanceDef::new(Some(16))),
             ecdsa: None,
@@ -160,6 +169,7 @@ impl BuiltinsInstanceDef {
     pub(crate) fn all_cairo() -> BuiltinsInstanceDef {
         BuiltinsInstanceDef {
             output: true,
+            system: false,
             pedersen: Some(PedersenInstanceDef::new(Some(256))),
             range_check: Some(RangeCheckInstanceDef::default()),
             ecdsa: Some(EcdsaInstanceDef::new(Some(2048))),
@@ -182,6 +192,7 @@ impl BuiltinsInstanceDef {
     pub(crate) fn all_cairo_stwo() -> BuiltinsInstanceDef {
         BuiltinsInstanceDef {
             output: true,
+            system: true,
             pedersen: Some(PedersenInstanceDef::new(Some(256))),
             range_check: Some(RangeCheckInstanceDef::default()),
             ecdsa: None,
@@ -204,6 +215,7 @@ impl BuiltinsInstanceDef {
     pub(crate) fn all_solidity() -> BuiltinsInstanceDef {
         BuiltinsInstanceDef {
             output: true,
+            system: true,
             pedersen: Some(PedersenInstanceDef::default()),
             range_check: Some(RangeCheckInstanceDef::default()),
             ecdsa: Some(EcdsaInstanceDef::default()),
@@ -270,6 +282,7 @@ impl BuiltinsInstanceDef {
 
         BuiltinsInstanceDef {
             output: true,
+            system: false,
             pedersen,
             range_check,
             ecdsa,
@@ -286,6 +299,7 @@ impl BuiltinsInstanceDef {
     pub(crate) fn perpetual() -> BuiltinsInstanceDef {
         BuiltinsInstanceDef {
             output: true,
+            system: false,
             pedersen: Some(PedersenInstanceDef::new(Some(32))),
             range_check: Some(RangeCheckInstanceDef::new(Some(16))),
             ecdsa: Some(EcdsaInstanceDef::new(Some(2048))),
@@ -302,6 +316,7 @@ impl BuiltinsInstanceDef {
     pub(crate) fn dex_with_bitwise() -> BuiltinsInstanceDef {
         BuiltinsInstanceDef {
             output: true,
+            system: false,
             pedersen: Some(PedersenInstanceDef::default()),
             range_check: Some(RangeCheckInstanceDef::default()),
             ecdsa: Some(EcdsaInstanceDef::default()),

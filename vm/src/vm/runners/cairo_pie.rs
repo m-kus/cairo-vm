@@ -852,6 +852,7 @@ pub(super) mod serde_impl {
         let mut map_serializer = serializer.serialize_map(Some(values.len()))?;
         const BUILTIN_ORDERED_LIST: &[BuiltinName] = &[
             BuiltinName::output,
+            BuiltinName::system,
             BuiltinName::pedersen,
             BuiltinName::range_check,
             BuiltinName::ecdsa,

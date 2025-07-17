@@ -41,6 +41,7 @@ use crate::{
             runners::builtin_runner::{
                 BitwiseBuiltinRunner, BuiltinRunner, EcOpBuiltinRunner, HashBuiltinRunner,
                 OutputBuiltinRunner, RangeCheckBuiltinRunner, SignatureBuiltinRunner,
+                SystemBuiltinRunner,
             },
             vm_core::VirtualMachine,
         },
@@ -281,6 +282,7 @@ impl CairoRunner {
     pub fn initialize_builtins(&mut self, allow_missing_builtins: bool) -> Result<(), RunnerError> {
         let builtin_ordered_list = vec![
             BuiltinName::output,
+            BuiltinName::system,
             BuiltinName::pedersen,
             BuiltinName::range_check,
             BuiltinName::ecdsa,
@@ -303,6 +305,15 @@ impl CairoRunner {
                 self.vm
                     .builtin_runners
                     .push(OutputBuiltinRunner::new(included).into());
+            }
+        }
+
+        if self.layout.builtins.system {
+            let included = program_builtins.remove(&BuiltinName::system);
+            if included || self.is_proof_mode() {
+                self.vm
+                    .builtin_runners
+                    .push(SystemBuiltinRunner::new(included).into());
             }
         }
 
@@ -459,6 +470,9 @@ impl CairoRunner {
                     ModBuiltinRunner::new_mul_mod(&ModInstanceDef::new(Some(1), 1, 96), true)
                         .into(),
                 ),
+                BuiltinName::system => vm
+                    .builtin_runners
+                    .push(SystemBuiltinRunner::new(true).into()),
             }
         }
 
@@ -688,6 +702,8 @@ impl CairoRunner {
             .hints_collection
             .hints_ranges
             .clone();
+        #[cfg(feature = "extensive_hints")]
+        let mut inner_program_constants = HashMap::new();
         #[cfg(feature = "test_utils")]
         self.vm.execute_before_first_step(&hint_data)?;
         while self.vm.get_pc() != address && !hint_processor.consumed() {
@@ -708,6 +724,8 @@ impl CairoRunner {
                 #[cfg(feature = "extensive_hints")]
                 &mut hint_ranges,
                 &self.program.constants,
+                #[cfg(feature = "extensive_hints")]
+                &mut inner_program_constants,
             )?;
 
             hint_processor.consume_step();
@@ -749,6 +767,9 @@ impl CairoRunner {
             })
             .unwrap_or(&[]);
 
+        #[cfg(feature = "extensive_hints")]
+        let mut inner_program_constants = HashMap::new();
+
         for remaining_steps in (1..=steps).rev() {
             if self.final_pc.as_ref() == Some(&self.vm.get_pc()) {
                 return Err(VirtualMachineError::EndOfProgram(remaining_steps));
@@ -764,6 +785,8 @@ impl CairoRunner {
                 #[cfg(feature = "extensive_hints")]
                 &mut hint_ranges,
                 &self.program.constants,
+                #[cfg(feature = "extensive_hints")]
+                &mut inner_program_constants,
             )?;
         }
 

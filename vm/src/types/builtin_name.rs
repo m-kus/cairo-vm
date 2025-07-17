@@ -16,6 +16,7 @@ const POSEIDON_BUILTIN_NAME: &str = "poseidon";
 const SEGMENT_ARENA_BUILTIN_NAME: &str = "segment_arena";
 const ADD_MOD_BUILTIN_NAME: &str = "add_mod";
 const MUL_MOD_BUILTIN_NAME: &str = "mul_mod";
+const SYSTEM_BUILTIN_NAME: &str = "system";
 
 const OUTPUT_BUILTIN_NAME_WITH_SUFFIX: &str = "output_builtin";
 const HASH_BUILTIN_NAME_WITH_SUFFIX: &str = "pedersen_builtin";
@@ -29,6 +30,7 @@ const POSEIDON_BUILTIN_NAME_WITH_SUFFIX: &str = "poseidon_builtin";
 const SEGMENT_ARENA_BUILTIN_NAME_WITH_SUFFIX: &str = "segment_arena_builtin";
 const ADD_MOD_BUILTIN_NAME_WITH_SUFFIX: &str = "add_mod_builtin";
 const MUL_MOD_BUILTIN_NAME_WITH_SUFFIX: &str = "mul_mod_builtin";
+const SYSTEM_BUILTIN_NAME_WITH_SUFFIX: &str = "system_builtin";
 
 /// Enum representing the name of a cairo builtin
 #[cfg_attr(feature = "test_utils", derive(Arbitrary))]
@@ -47,6 +49,7 @@ pub enum BuiltinName {
     range_check96,
     add_mod,
     mul_mod,
+    system,
 }
 
 impl BuiltinName {
@@ -75,6 +78,7 @@ impl BuiltinName {
             BuiltinName::range_check96 => RANGE_CHECK_96_BUILTIN_NAME_WITH_SUFFIX,
             BuiltinName::add_mod => ADD_MOD_BUILTIN_NAME_WITH_SUFFIX,
             BuiltinName::mul_mod => MUL_MOD_BUILTIN_NAME_WITH_SUFFIX,
+            BuiltinName::system => SYSTEM_BUILTIN_NAME_WITH_SUFFIX,
         }
     }
 
@@ -103,6 +107,7 @@ impl BuiltinName {
             BuiltinName::range_check96 => RANGE_CHECK_96_BUILTIN_NAME,
             BuiltinName::add_mod => ADD_MOD_BUILTIN_NAME,
             BuiltinName::mul_mod => MUL_MOD_BUILTIN_NAME,
+            BuiltinName::system => SYSTEM_BUILTIN_NAME,
         }
     }
 
@@ -132,6 +137,7 @@ impl BuiltinName {
             RANGE_CHECK_96_BUILTIN_NAME_WITH_SUFFIX => Some(BuiltinName::range_check96),
             ADD_MOD_BUILTIN_NAME_WITH_SUFFIX => Some(BuiltinName::add_mod),
             MUL_MOD_BUILTIN_NAME_WITH_SUFFIX => Some(BuiltinName::mul_mod),
+            SYSTEM_BUILTIN_NAME_WITH_SUFFIX => Some(BuiltinName::system),
             _ => None,
         }
     }
@@ -164,6 +170,7 @@ impl BuiltinName {
             RANGE_CHECK_96_BUILTIN_NAME => Some(BuiltinName::range_check96),
             ADD_MOD_BUILTIN_NAME => Some(BuiltinName::add_mod),
             MUL_MOD_BUILTIN_NAME => Some(BuiltinName::mul_mod),
+            SYSTEM_BUILTIN_NAME => Some(BuiltinName::system),
             _ => None,
         }
     }
