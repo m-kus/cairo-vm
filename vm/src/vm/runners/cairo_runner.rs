@@ -1,3 +1,4 @@
+use crate::vm::runners::builtin_runner::Sha256BuiltinRunner;
 use crate::vm::trace::trace_entry::TraceEntry;
 use crate::{
     air_private_input::AirPrivateInput,
@@ -288,6 +289,7 @@ impl CairoRunner {
             BuiltinName::ec_op,
             BuiltinName::keccak,
             BuiltinName::poseidon,
+            BuiltinName::sha256,
             BuiltinName::range_check96,
             BuiltinName::add_mod,
             BuiltinName::mul_mod,
@@ -373,6 +375,15 @@ impl CairoRunner {
             }
         }
 
+        if let Some(instance_def) = self.layout.builtins.sha256.as_ref() {
+            let included = program_builtins.remove(&BuiltinName::sha256);
+            if included || self.is_proof_mode() {
+                self.vm
+                    .builtin_runners
+                    .push(Sha256BuiltinRunner::new(instance_def.ratio, included).into());
+            }
+        }
+
         if let Some(instance_def) = self.layout.builtins.range_check96.as_ref() {
             let included = program_builtins.remove(&BuiltinName::range_check96);
             if included || self.is_proof_mode() {
@@ -445,6 +456,9 @@ impl CairoRunner {
                 BuiltinName::poseidon => vm
                     .builtin_runners
                     .push(PoseidonBuiltinRunner::new(Some(1), true).into()),
+                BuiltinName::sha256 => vm
+                    .builtin_runners
+                    .push(Sha256BuiltinRunner::new(Some(1), true).into()),
                 BuiltinName::segment_arena => vm
                     .builtin_runners
                     .push(SegmentArenaBuiltinRunner::new(true).into()),

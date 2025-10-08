@@ -31,6 +31,8 @@ pub struct AirPrivateInputSerializable {
     #[serde(skip_serializing_if = "Option::is_none")]
     poseidon: Option<Vec<PrivateInput>>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    sha256: Option<Vec<PrivateInput>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     add_mod: Option<PrivateInput>,
     #[serde(skip_serializing_if = "Option::is_none")]
     mul_mod: Option<PrivateInput>,
@@ -49,6 +51,7 @@ pub enum PrivateInput {
     PoseidonState(PrivateInputPoseidonState),
     KeccakState(PrivateInputKeccakState),
     Signature(PrivateInputSignature),
+    Sha256State(PrivateInputSha256State),
     Mod(ModInput),
 }
 
@@ -131,6 +134,27 @@ pub struct ModInputInstance {
     pub batch: BTreeMap<usize, ModInputMemoryVars>,
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct PrivateInputSha256State {
+    pub index: usize,
+    pub input_s0: Felt252,
+    pub input_s1: Felt252,
+    pub input_s2: Felt252,
+    pub input_s3: Felt252,
+    pub input_s4: Felt252,
+    pub input_s5: Felt252,
+    pub input_s6: Felt252,
+    pub input_s7: Felt252,
+    pub input_s8: Felt252,
+    pub input_s9: Felt252,
+    pub input_s10: Felt252,
+    pub input_s11: Felt252,
+    pub input_s12: Felt252,
+    pub input_s13: Felt252,
+    pub input_s14: Felt252,
+    pub input_s15: Felt252,
+}
+
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 pub struct ModInputMemoryVars {
     pub a_offset: usize,
@@ -167,6 +191,7 @@ impl AirPrivateInput {
             ec_op: self.0.get(&BuiltinName::ec_op).cloned(),
             keccak: self.0.get(&BuiltinName::keccak).cloned(),
             poseidon: self.0.get(&BuiltinName::poseidon).cloned(),
+            sha256: self.0.get(&BuiltinName::sha256).cloned(),
             add_mod: self
                 .0
                 .get(&BuiltinName::add_mod)
@@ -196,7 +221,7 @@ impl From<AirPrivateInputSerializable> for AirPrivateInput {
         insert_input(BuiltinName::ec_op, private_input.ec_op);
         insert_input(BuiltinName::keccak, private_input.keccak);
         insert_input(BuiltinName::poseidon, private_input.poseidon);
-
+        insert_input(BuiltinName::sha256, private_input.sha256);
         Self(inputs)
     }
 }
@@ -362,6 +387,25 @@ mod tests {
                     input_s2: Felt252::from(3),
                 },
             )]),
+            sha256: Some(vec![PrivateInput::Sha256State(PrivateInputSha256State {
+                index: 0,
+                input_s0: Felt252::from(0),
+                input_s1: Felt252::from(1),
+                input_s2: Felt252::from(2),
+                input_s3: Felt252::from(3),
+                input_s4: Felt252::from(4),
+                input_s5: Felt252::from(5),
+                input_s6: Felt252::from(6),
+                input_s7: Felt252::from(7),
+                input_s8: Felt252::from(8),
+                input_s9: Felt252::from(9),
+                input_s10: Felt252::from(10),
+                input_s11: Felt252::from(11),
+                input_s12: Felt252::from(12),
+                input_s13: Felt252::from(13),
+                input_s14: Felt252::from(14),
+                input_s15: Felt252::from(15),
+            })]),
             add_mod: None,
             mul_mod: None,
         };

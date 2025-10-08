@@ -21,6 +21,9 @@ use crate::types::instance_definitions::poseidon_instance_def::{
     CELLS_PER_POSEIDON, INPUT_CELLS_PER_POSEIDON,
 };
 use crate::types::instance_definitions::range_check_instance_def::CELLS_PER_RANGE_CHECK;
+use crate::types::instance_definitions::sha256_instance_def::{
+    CELLS_PER_SHA256, INPUT_CELLS_PER_SHA256,
+};
 use crate::types::relocatable::{MaybeRelocatable, Relocatable};
 use crate::vm::errors::memory_errors::{self, InsufficientAllocatedCellsError, MemoryError};
 use crate::vm::errors::runner_errors::RunnerError;
@@ -38,6 +41,7 @@ mod output;
 mod poseidon;
 mod range_check;
 mod segment_arena;
+mod sha256;
 mod signature;
 
 pub use self::keccak::KeccakBuiltinRunner;
@@ -52,6 +56,7 @@ pub use output::{OutputBuiltinRunner, OutputBuiltinState};
 pub use poseidon::PoseidonBuiltinRunner;
 pub use range_check::RangeCheckBuiltinRunner;
 pub use segment_arena::SegmentArenaBuiltinRunner;
+pub use sha256::Sha256BuiltinRunner;
 pub use signature::SignatureBuiltinRunner;
 
 use super::cairo_pie::BuiltinAdditionalData;
@@ -80,6 +85,7 @@ pub enum BuiltinRunner {
     Keccak(KeccakBuiltinRunner),
     Signature(SignatureBuiltinRunner),
     Poseidon(PoseidonBuiltinRunner),
+    Sha256(Sha256BuiltinRunner),
     SegmentArena(SegmentArenaBuiltinRunner),
     Mod(ModBuiltinRunner),
 }
@@ -101,6 +107,7 @@ impl BuiltinRunner {
             BuiltinRunner::Keccak(ref mut keccak) => keccak.initialize_segments(segments),
             BuiltinRunner::Signature(ref mut signature) => signature.initialize_segments(segments),
             BuiltinRunner::Poseidon(ref mut poseidon) => poseidon.initialize_segments(segments),
+            BuiltinRunner::Sha256(ref mut sha256) => sha256.initialize_segments(segments),
             BuiltinRunner::SegmentArena(ref mut segment_arena) => {
                 segment_arena.initialize_segments(segments)
             }
@@ -119,6 +126,7 @@ impl BuiltinRunner {
             BuiltinRunner::Keccak(ref keccak) => keccak.initial_stack(),
             BuiltinRunner::Signature(ref signature) => signature.initial_stack(),
             BuiltinRunner::Poseidon(ref poseidon) => poseidon.initial_stack(),
+            BuiltinRunner::Sha256(ref sha256) => sha256.initial_stack(),
             BuiltinRunner::SegmentArena(ref segment_arena) => segment_arena.initial_stack(),
             BuiltinRunner::Mod(ref modulo) => modulo.initial_stack(),
         }
@@ -244,6 +252,7 @@ impl BuiltinRunner {
             BuiltinRunner::Keccak(ref keccak) => keccak.included,
             BuiltinRunner::Signature(ref signature) => signature.included,
             BuiltinRunner::Poseidon(ref poseidon) => poseidon.included,
+            BuiltinRunner::Sha256(ref sha256) => sha256.included,
             BuiltinRunner::SegmentArena(ref segment_arena) => segment_arena.included,
             BuiltinRunner::Mod(ref modulo) => modulo.included,
         }
@@ -261,6 +270,7 @@ impl BuiltinRunner {
             BuiltinRunner::Keccak(ref keccak) => keccak.base(),
             BuiltinRunner::Signature(ref signature) => signature.base(),
             BuiltinRunner::Poseidon(ref poseidon) => poseidon.base(),
+            BuiltinRunner::Sha256(ref sha256) => sha256.base(),
             //Warning, returns only the segment index, base offset will be 3
             BuiltinRunner::SegmentArena(ref segment_arena) => segment_arena.base(),
             BuiltinRunner::Mod(ref modulo) => modulo.base(),
@@ -278,6 +288,7 @@ impl BuiltinRunner {
             BuiltinRunner::Keccak(keccak) => keccak.ratio(),
             BuiltinRunner::Signature(ref signature) => signature.ratio(),
             BuiltinRunner::Poseidon(poseidon) => poseidon.ratio(),
+            BuiltinRunner::Sha256(sha256) => sha256.ratio(),
             BuiltinRunner::Mod(ref modulo) => modulo.ratio(),
         }
     }
@@ -297,6 +308,7 @@ impl BuiltinRunner {
             BuiltinRunner::RangeCheck96(ref range_check) => range_check.add_validation_rule(memory),
             BuiltinRunner::Signature(ref signature) => signature.add_validation_rule(memory),
             BuiltinRunner::Poseidon(ref poseidon) => poseidon.add_validation_rule(memory),
+            BuiltinRunner::Sha256(ref sha256) => sha256.add_validation_rule(memory),
             _ => {}
         }
     }
@@ -312,6 +324,7 @@ impl BuiltinRunner {
             BuiltinRunner::Hash(ref hash) => hash.deduce_memory_cell(address, memory),
             BuiltinRunner::Keccak(ref keccak) => keccak.deduce_memory_cell(address, memory),
             BuiltinRunner::Poseidon(ref poseidon) => poseidon.deduce_memory_cell(address, memory),
+            BuiltinRunner::Sha256(ref sha256) => sha256.deduce_memory_cell(address, memory),
             _ => Ok(None),
         }
     }
@@ -331,6 +344,7 @@ impl BuiltinRunner {
             BuiltinRunner::Keccak(ref keccak) => keccak.get_used_cells(segments),
             BuiltinRunner::Signature(ref signature) => signature.get_used_cells(segments),
             BuiltinRunner::Poseidon(ref poseidon) => poseidon.get_used_cells(segments),
+            BuiltinRunner::Sha256(ref sha256) => sha256.get_used_cells(segments),
             BuiltinRunner::SegmentArena(ref segment_arena) => {
                 segment_arena.get_used_cells(segments)
             }
@@ -354,6 +368,7 @@ impl BuiltinRunner {
             BuiltinRunner::Keccak(ref keccak) => keccak.get_used_instances(segments),
             BuiltinRunner::Signature(ref signature) => signature.get_used_instances(segments),
             BuiltinRunner::Poseidon(ref poseidon) => poseidon.get_used_instances(segments),
+            BuiltinRunner::Sha256(ref sha256) => sha256.get_used_instances(segments),
             BuiltinRunner::SegmentArena(ref segment_arena) => {
                 segment_arena.get_used_instances(segments)
             }
@@ -411,6 +426,7 @@ impl BuiltinRunner {
             BuiltinRunner::Keccak(_) => CELLS_PER_KECCAK,
             BuiltinRunner::Signature(_) => CELLS_PER_SIGNATURE,
             BuiltinRunner::Poseidon(_) => CELLS_PER_POSEIDON,
+            BuiltinRunner::Sha256(_) => CELLS_PER_SHA256,
             BuiltinRunner::SegmentArena(_) => ARENA_BUILTIN_SIZE,
             BuiltinRunner::Mod(_) => CELLS_PER_MOD,
         }
@@ -426,6 +442,7 @@ impl BuiltinRunner {
             BuiltinRunner::Keccak(_) => INPUT_CELLS_PER_KECCAK,
             BuiltinRunner::Signature(_) => CELLS_PER_SIGNATURE,
             BuiltinRunner::Poseidon(_) => INPUT_CELLS_PER_POSEIDON,
+            BuiltinRunner::Sha256(_) => INPUT_CELLS_PER_SHA256,
             BuiltinRunner::SegmentArena(_) => ARENA_BUILTIN_SIZE,
             BuiltinRunner::Mod(_) => CELLS_PER_MOD,
         }
@@ -449,6 +466,7 @@ impl BuiltinRunner {
             BuiltinRunner::Keccak(_) => BuiltinName::keccak,
             BuiltinRunner::Signature(_) => BuiltinName::ecdsa,
             BuiltinRunner::Poseidon(_) => BuiltinName::poseidon,
+            BuiltinRunner::Sha256(_) => BuiltinName::sha256,
             BuiltinRunner::SegmentArena(_) => BuiltinName::segment_arena,
             BuiltinRunner::Mod(b) => b.name(),
         }
@@ -603,6 +621,7 @@ impl BuiltinRunner {
             BuiltinRunner::EcOp(builtin) => builtin.air_private_input(&segments.memory),
             BuiltinRunner::Poseidon(builtin) => builtin.air_private_input(&segments.memory),
             BuiltinRunner::Signature(builtin) => builtin.air_private_input(&segments.memory),
+            BuiltinRunner::Sha256(builtin) => builtin.air_private_input(&segments.memory),
             BuiltinRunner::Keccak(builtin) => builtin.air_private_input(&segments.memory),
             BuiltinRunner::Mod(builtin) => builtin.air_private_input(segments),
             _ => vec![],
@@ -626,6 +645,7 @@ impl BuiltinRunner {
                 segment_arena.stop_ptr = Some(stop_ptr)
             }
             BuiltinRunner::Mod(modulo) => modulo.stop_ptr = Some(stop_ptr),
+            BuiltinRunner::Sha256(ref mut sha256) => sha256.stop_ptr = Some(stop_ptr),
         }
     }
 
@@ -642,6 +662,7 @@ impl BuiltinRunner {
             BuiltinRunner::Poseidon(ref poseidon) => poseidon.stop_ptr,
             BuiltinRunner::SegmentArena(ref segment_arena) => segment_arena.stop_ptr,
             BuiltinRunner::Mod(ref modulo) => modulo.stop_ptr,
+            BuiltinRunner::Sha256(ref sha256) => sha256.stop_ptr,
         }
     }
 }
@@ -712,6 +733,11 @@ impl From<ModBuiltinRunner> for BuiltinRunner {
     }
 }
 
+impl From<Sha256BuiltinRunner> for BuiltinRunner {
+    fn from(runner: Sha256BuiltinRunner) -> Self {
+        BuiltinRunner::Sha256(runner)
+    }
+}
 #[cfg(test)]
 mod tests {
     use super::*;
