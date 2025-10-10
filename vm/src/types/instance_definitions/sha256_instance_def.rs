@@ -1,7 +1,7 @@
 use serde::Serialize;
 
-pub(crate) const CELLS_PER_SHA256: u32 = 24;
-pub(crate) const INPUT_CELLS_PER_SHA256: u32 = 16;
+pub(crate) const CELLS_PER_SHA256: u32 = 32; // state 8 + input 16 + output 8
+pub(crate) const INPUT_CELLS_PER_SHA256: u32 = 24; // state 8 + input 16
 
 #[derive(Serialize, Clone, Debug, PartialEq)]
 pub(crate) struct Sha256InstanceDef {

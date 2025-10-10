@@ -86,15 +86,24 @@ impl Sha256BuiltinRunner {
             };
             input_felts.push(val)
         }
-        // n_input_cells is fixed to 16, so this try_into will never fail
-        let sha256_felt: [Felt252; 16] = input_felts.try_into().unwrap();
-        let sha256_u32: [u32; 16] = sha256_felt
+
+        let state_felt: [Felt252; 8] = input_felts[..8].try_into().unwrap();
+        let state_u32: [u32; 8] = state_felt
             .iter()
             .map(|x| x.to_u32().unwrap())
             .collect::<Vec<u32>>()
             .try_into()
             .unwrap();
-        let output_u32 = sha256(&sha256_u32);
+        // n_input_cells is fixed to 16, so this try_into will never fail
+        let block_felt: [Felt252; 16] = input_felts[8..].try_into().unwrap();
+        let block_u32: [u32; 16] = block_felt
+            .iter()
+            .map(|x| x.to_u32().unwrap())
+            .collect::<Vec<u32>>()
+            .try_into()
+            .unwrap();
+
+        let output_u32 = sha256(&state_u32, &block_u32);
 
         for (i, elem) in output_u32.iter().enumerate() {
             self.cache
@@ -129,22 +138,30 @@ impl Sha256BuiltinRunner {
             {
                 // Add the input cells of each poseidon instance to the private inputs
                 if let (
-                    Ok(input_s0),
-                    Ok(input_s1),
-                    Ok(input_s2),
-                    Ok(input_s3),
-                    Ok(input_s4),
-                    Ok(input_s5),
-                    Ok(input_s6),
-                    Ok(input_s7),
-                    Ok(input_s8),
-                    Ok(input_s9),
-                    Ok(input_s10),
-                    Ok(input_s11),
-                    Ok(input_s12),
-                    Ok(input_s13),
-                    Ok(input_s14),
-                    Ok(input_s15),
+                    Ok(state_s0),
+                    Ok(state_s1),
+                    Ok(state_s2),
+                    Ok(state_s3),
+                    Ok(state_s4),
+                    Ok(state_s5),
+                    Ok(state_s6),
+                    Ok(state_s7),
+                    Ok(block_s8),
+                    Ok(block_s9),
+                    Ok(block_s10),
+                    Ok(block_s11),
+                    Ok(block_s12),
+                    Ok(block_s13),
+                    Ok(block_s14),
+                    Ok(block_s15),
+                    Ok(block_s16),
+                    Ok(block_s17),
+                    Ok(block_s18),
+                    Ok(block_s19),
+                    Ok(block_s20),
+                    Ok(block_s21),
+                    Ok(block_s22),
+                    Ok(block_s23),
                 ) = (
                     memory.get_integer((self.base as isize, off).into()),
                     memory.get_integer((self.base as isize, off + 1).into()),
@@ -162,25 +179,41 @@ impl Sha256BuiltinRunner {
                     memory.get_integer((self.base as isize, off + 13).into()),
                     memory.get_integer((self.base as isize, off + 14).into()),
                     memory.get_integer((self.base as isize, off + 15).into()),
+                    memory.get_integer((self.base as isize, off + 16).into()),
+                    memory.get_integer((self.base as isize, off + 17).into()),
+                    memory.get_integer((self.base as isize, off + 18).into()),
+                    memory.get_integer((self.base as isize, off + 19).into()),
+                    memory.get_integer((self.base as isize, off + 20).into()),
+                    memory.get_integer((self.base as isize, off + 21).into()),
+                    memory.get_integer((self.base as isize, off + 22).into()),
+                    memory.get_integer((self.base as isize, off + 23).into()),
                 ) {
                     private_inputs.push(PrivateInput::Sha256State(PrivateInputSha256State {
                         index,
-                        input_s0: *input_s0,
-                        input_s1: *input_s1,
-                        input_s2: *input_s2,
-                        input_s3: *input_s3,
-                        input_s4: *input_s4,
-                        input_s5: *input_s5,
-                        input_s6: *input_s6,
-                        input_s7: *input_s7,
-                        input_s8: *input_s8,
-                        input_s9: *input_s9,
-                        input_s10: *input_s10,
-                        input_s11: *input_s11,
-                        input_s12: *input_s12,
-                        input_s13: *input_s13,
-                        input_s14: *input_s14,
-                        input_s15: *input_s15,
+                        state_s0: *state_s0,
+                        state_s1: *state_s1,
+                        state_s2: *state_s2,
+                        state_s3: *state_s3,
+                        state_s4: *state_s4,
+                        state_s5: *state_s5,
+                        state_s6: *state_s6,
+                        state_s7: *state_s7,
+                        block_s8: *block_s8,
+                        block_s9: *block_s9,
+                        block_s10: *block_s10,
+                        block_s11: *block_s11,
+                        block_s12: *block_s12,
+                        block_s13: *block_s13,
+                        block_s14: *block_s14,
+                        block_s15: *block_s15,
+                        block_s16: *block_s16,
+                        block_s17: *block_s17,
+                        block_s18: *block_s18,
+                        block_s19: *block_s19,
+                        block_s20: *block_s20,
+                        block_s21: *block_s21,
+                        block_s22: *block_s22,
+                        block_s23: *block_s23,
                     }))
                 }
             }
@@ -199,16 +232,17 @@ const K: [u32; 64] = [
     0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
     0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2,
 ];
-pub fn sha256(input: &[u32; 16]) -> [u32; 8] {
+
+pub fn sha256(state: &[u32; 8], input: &[u32; 16]) -> [u32; 8] {
     let mut wis = [0; 64];
-    let mut a: u32 = 0x6a09e667;
-    let mut b: u32 = 0xbb67ae85;
-    let mut c: u32 = 0x3c6ef372;
-    let mut d: u32 = 0xa54ff53a;
-    let mut e: u32 = 0x510e527f;
-    let mut f: u32 = 0x9b05688c;
-    let mut g: u32 = 0x1f83d9ab;
-    let mut h: u32 = 0x5be0cd19;
+    let mut a: u32 = state[0];
+    let mut b: u32 = state[1];
+    let mut c: u32 = state[2];
+    let mut d: u32 = state[3];
+    let mut e: u32 = state[4];
+    let mut f: u32 = state[5];
+    let mut g: u32 = state[6];
+    let mut h: u32 = state[7];
     wis[..16].copy_from_slice(input);
     for t in 16..64 {
         let term1 = _sigma1(wis[t - 2]);
