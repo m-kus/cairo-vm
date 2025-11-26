@@ -16,6 +16,7 @@ const POSEIDON_BUILTIN_NAME: &str = "poseidon";
 const SEGMENT_ARENA_BUILTIN_NAME: &str = "segment_arena";
 const ADD_MOD_BUILTIN_NAME: &str = "add_mod";
 const MUL_MOD_BUILTIN_NAME: &str = "mul_mod";
+const SHA256_BUILTIN_NAME: &str = "sha256";
 
 const OUTPUT_BUILTIN_NAME_WITH_SUFFIX: &str = "output_builtin";
 const HASH_BUILTIN_NAME_WITH_SUFFIX: &str = "pedersen_builtin";
@@ -29,7 +30,7 @@ const POSEIDON_BUILTIN_NAME_WITH_SUFFIX: &str = "poseidon_builtin";
 const SEGMENT_ARENA_BUILTIN_NAME_WITH_SUFFIX: &str = "segment_arena_builtin";
 const ADD_MOD_BUILTIN_NAME_WITH_SUFFIX: &str = "add_mod_builtin";
 const MUL_MOD_BUILTIN_NAME_WITH_SUFFIX: &str = "mul_mod_builtin";
-
+const SHA256_BUILTIN_NAME_WITH_SUFFIX: &str = "sha256_builtin";
 /// Enum representing the name of a cairo builtin
 #[cfg_attr(feature = "test_utils", derive(Arbitrary))]
 #[derive(Serialize, Deserialize, Debug, PartialEq, Copy, Clone, Eq, Hash, Ord, PartialOrd)]
@@ -43,6 +44,7 @@ pub enum BuiltinName {
     bitwise,
     ec_op,
     poseidon,
+    sha256,
     segment_arena,
     range_check96,
     add_mod,
@@ -71,6 +73,7 @@ impl BuiltinName {
             BuiltinName::bitwise => BITWISE_BUILTIN_NAME_WITH_SUFFIX,
             BuiltinName::ec_op => EC_OP_BUILTIN_NAME_WITH_SUFFIX,
             BuiltinName::poseidon => POSEIDON_BUILTIN_NAME_WITH_SUFFIX,
+            BuiltinName::sha256 => SHA256_BUILTIN_NAME_WITH_SUFFIX,
             BuiltinName::segment_arena => SEGMENT_ARENA_BUILTIN_NAME_WITH_SUFFIX,
             BuiltinName::range_check96 => RANGE_CHECK_96_BUILTIN_NAME_WITH_SUFFIX,
             BuiltinName::add_mod => ADD_MOD_BUILTIN_NAME_WITH_SUFFIX,
@@ -99,6 +102,7 @@ impl BuiltinName {
             BuiltinName::bitwise => BITWISE_BUILTIN_NAME,
             BuiltinName::ec_op => EC_OP_BUILTIN_NAME,
             BuiltinName::poseidon => POSEIDON_BUILTIN_NAME,
+            BuiltinName::sha256 => SHA256_BUILTIN_NAME,
             BuiltinName::segment_arena => SEGMENT_ARENA_BUILTIN_NAME,
             BuiltinName::range_check96 => RANGE_CHECK_96_BUILTIN_NAME,
             BuiltinName::add_mod => ADD_MOD_BUILTIN_NAME,
@@ -128,6 +132,7 @@ impl BuiltinName {
             BITWISE_BUILTIN_NAME_WITH_SUFFIX => Some(BuiltinName::bitwise),
             EC_OP_BUILTIN_NAME_WITH_SUFFIX => Some(BuiltinName::ec_op),
             POSEIDON_BUILTIN_NAME_WITH_SUFFIX => Some(BuiltinName::poseidon),
+            SHA256_BUILTIN_NAME_WITH_SUFFIX => Some(BuiltinName::sha256),
             SEGMENT_ARENA_BUILTIN_NAME_WITH_SUFFIX => Some(BuiltinName::segment_arena),
             RANGE_CHECK_96_BUILTIN_NAME_WITH_SUFFIX => Some(BuiltinName::range_check96),
             ADD_MOD_BUILTIN_NAME_WITH_SUFFIX => Some(BuiltinName::add_mod),
@@ -160,6 +165,7 @@ impl BuiltinName {
             BITWISE_BUILTIN_NAME => Some(BuiltinName::bitwise),
             EC_OP_BUILTIN_NAME => Some(BuiltinName::ec_op),
             POSEIDON_BUILTIN_NAME => Some(BuiltinName::poseidon),
+            SHA256_BUILTIN_NAME => Some(BuiltinName::sha256),
             SEGMENT_ARENA_BUILTIN_NAME => Some(BuiltinName::segment_arena),
             RANGE_CHECK_96_BUILTIN_NAME => Some(BuiltinName::range_check96),
             ADD_MOD_BUILTIN_NAME => Some(BuiltinName::add_mod),

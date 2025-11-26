@@ -1,3 +1,4 @@
+use crate::types::instance_definitions::sha256_instance_def::Sha256InstanceDef;
 use crate::types::layout::CairoLayoutParams;
 
 use super::mod_instance_def::ModInstanceDef;
@@ -23,6 +24,7 @@ pub(crate) struct BuiltinsInstanceDef {
     pub(crate) ec_op: Option<EcOpInstanceDef>,
     pub(crate) keccak: Option<KeccakInstanceDef>,
     pub(crate) poseidon: Option<PoseidonInstanceDef>,
+    pub(crate) sha256: Option<Sha256InstanceDef>,
     pub(crate) range_check96: Option<RangeCheckInstanceDef>,
     pub(crate) add_mod: Option<ModInstanceDef>,
     pub(crate) mul_mod: Option<ModInstanceDef>,
@@ -39,6 +41,7 @@ impl BuiltinsInstanceDef {
             ec_op: None,
             keccak: None,
             poseidon: None,
+            sha256: None,
             range_check96: None,
             add_mod: None,
             mul_mod: None,
@@ -55,6 +58,7 @@ impl BuiltinsInstanceDef {
             ec_op: None,
             keccak: None,
             poseidon: None,
+            sha256: None,
             range_check96: None,
             add_mod: None,
             mul_mod: None,
@@ -71,6 +75,7 @@ impl BuiltinsInstanceDef {
             ec_op: None,
             keccak: None,
             poseidon: None,
+            sha256: None,
             range_check96: None,
             add_mod: None,
             mul_mod: None,
@@ -87,6 +92,7 @@ impl BuiltinsInstanceDef {
             ec_op: None,
             keccak: None,
             poseidon: None,
+            sha256: None,
             range_check96: None,
             add_mod: None,
             mul_mod: None,
@@ -103,6 +109,7 @@ impl BuiltinsInstanceDef {
             ec_op: Some(EcOpInstanceDef::new(Some(1024))),
             keccak: None,
             poseidon: Some(PoseidonInstanceDef::default()),
+            sha256: None,
             range_check96: None,
             add_mod: None,
             mul_mod: None,
@@ -119,6 +126,7 @@ impl BuiltinsInstanceDef {
             ec_op: Some(EcOpInstanceDef::new(Some(1024))),
             keccak: Some(KeccakInstanceDef::new(Some(2048))),
             poseidon: Some(PoseidonInstanceDef::default()),
+            sha256: None,
             range_check96: None,
             add_mod: None,
             mul_mod: None,
@@ -135,6 +143,7 @@ impl BuiltinsInstanceDef {
             ec_op: None,
             keccak: None,
             poseidon: Some(PoseidonInstanceDef::new(Some(8))),
+            sha256: None,
             range_check96: None,
             add_mod: None,
             mul_mod: None,
@@ -151,6 +160,7 @@ impl BuiltinsInstanceDef {
             ec_op: None,
             keccak: None,
             poseidon: Some(PoseidonInstanceDef::new(Some(64))),
+            sha256: None,
             range_check96: None,
             add_mod: None,
             mul_mod: None,
@@ -167,6 +177,7 @@ impl BuiltinsInstanceDef {
             ec_op: Some(EcOpInstanceDef::new(Some(1024))),
             keccak: Some(KeccakInstanceDef::new(Some(2048))),
             poseidon: Some(PoseidonInstanceDef::new(Some(256))),
+            sha256: Some(Sha256InstanceDef::default()),
             range_check96: Some(RangeCheckInstanceDef::new(Some(8))),
             #[cfg(feature = "mod_builtin")]
             add_mod: Some(ModInstanceDef::new(Some(128), 1, 96)),
@@ -189,6 +200,7 @@ impl BuiltinsInstanceDef {
             ec_op: None,
             keccak: None,
             poseidon: Some(PoseidonInstanceDef::new(Some(256))),
+            sha256: Some(Sha256InstanceDef::default()),
             range_check96: Some(RangeCheckInstanceDef::new(Some(8))),
             #[cfg(feature = "mod_builtin")]
             add_mod: Some(ModInstanceDef::new(Some(128), 1, 96)),
@@ -211,6 +223,7 @@ impl BuiltinsInstanceDef {
             ec_op: Some(EcOpInstanceDef::default()),
             keccak: None,
             poseidon: None,
+            sha256: None,
             range_check96: None,
             add_mod: None,
             mul_mod: None,
@@ -239,6 +252,7 @@ impl BuiltinsInstanceDef {
         let poseidon = Some(PoseidonInstanceDef {
             ratio: Some(params.poseidon_ratio),
         });
+        let sha256 = Some(Sha256InstanceDef::default());
         let range_check96 = Some(RangeCheckInstanceDef {
             ratio: Some(LowRatio::new(
                 params.range_check96_ratio,
@@ -277,6 +291,7 @@ impl BuiltinsInstanceDef {
             ec_op,
             keccak,
             poseidon,
+            sha256,
             range_check96,
             add_mod,
             mul_mod,
@@ -293,6 +308,7 @@ impl BuiltinsInstanceDef {
             ec_op: None,
             keccak: None,
             poseidon: None,
+            sha256: None,
             range_check96: None,
             add_mod: None,
             mul_mod: None,
@@ -309,6 +325,7 @@ impl BuiltinsInstanceDef {
             ec_op: None,
             keccak: None,
             poseidon: None,
+            sha256: None,
             range_check96: None,
             add_mod: None,
             mul_mod: None,
@@ -335,6 +352,7 @@ mod tests {
         assert!(builtins.ec_op.is_none());
         assert!(builtins.keccak.is_none());
         assert!(builtins.poseidon.is_none());
+        assert!(builtins.sha256.is_none());
     }
 
     #[test]
@@ -349,6 +367,7 @@ mod tests {
         assert!(builtins.ec_op.is_none());
         assert!(builtins.keccak.is_none());
         assert!(builtins.poseidon.is_none());
+        assert!(builtins.sha256.is_none());
     }
 
     #[test]
@@ -363,6 +382,7 @@ mod tests {
         assert!(builtins.ec_op.is_none());
         assert!(builtins.keccak.is_none());
         assert!(builtins.poseidon.is_none());
+        assert!(builtins.sha256.is_none());
     }
 
     #[test]
@@ -377,6 +397,7 @@ mod tests {
         assert!(builtins.ec_op.is_none());
         assert!(builtins.keccak.is_none());
         assert!(builtins.poseidon.is_none());
+        assert!(builtins.sha256.is_none());
     }
 
     #[test]
@@ -390,6 +411,7 @@ mod tests {
         assert!(builtins.ec_op.is_some());
         assert!(builtins.keccak.is_none());
         assert!(builtins.poseidon.is_some());
+        assert!(builtins.sha256.is_none());
     }
 
     #[test]
@@ -403,6 +425,7 @@ mod tests {
         assert!(builtins.ec_op.is_some());
         assert!(builtins.keccak.is_some());
         assert!(builtins.poseidon.is_some());
+        assert!(builtins.sha256.is_none());
     }
 
     #[test]
@@ -416,6 +439,7 @@ mod tests {
         assert!(builtins.ec_op.is_none());
         assert!(builtins.keccak.is_none());
         assert!(builtins.poseidon.is_some());
+        assert!(builtins.sha256.is_none());
     }
 
     #[test]
@@ -437,6 +461,7 @@ mod tests {
         assert!(builtins.add_mod.is_none());
         #[cfg(not(feature = "mod_builtin"))]
         assert!(builtins.mul_mod.is_none());
+        assert!(builtins.sha256.is_some());
     }
 
     #[test]
@@ -458,6 +483,7 @@ mod tests {
         assert!(builtins.add_mod.is_none());
         #[cfg(not(feature = "mod_builtin"))]
         assert!(builtins.mul_mod.is_none());
+        assert!(builtins.sha256.is_some());
     }
 
     #[test]

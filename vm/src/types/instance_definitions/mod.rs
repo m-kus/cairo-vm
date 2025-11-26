@@ -11,6 +11,7 @@ pub mod mod_instance_def;
 pub mod pedersen_instance_def;
 pub mod poseidon_instance_def;
 pub mod range_check_instance_def;
+pub mod sha256_instance_def;
 
 #[derive(Serialize, Debug, PartialEq, Copy, Clone)]
 pub struct LowRatio {
